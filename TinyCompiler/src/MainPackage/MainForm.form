@@ -38,7 +38,7 @@
                   <font name="Consolas"/>
                   <foreground color="-1776412"/>
                   <margin top="16" left="16" bottom="16" right="16"/>
-                  <text value="import Small_Java.io;&#10;import Small_Java.lang;&#10;&#10;public class_SJ class {&#10;&#9;int_SJ mavar := 5;&#10;&#9;int_SJ ma2var := 5+mavar;&#10;&#9;main_SJ&#10;&#9;{&#10;&#9;&#9;Si (5&gt;6 &amp; (mavar &gt; ma2var | ! 9 &gt; 1)) Alors {&#10;&#9;&#9;&#9;mavar := (7*6)/(1+2);&#10;&#9;&#9;&#9;ma2var := mavar + (7*6)/(1+2);&#10;&#9;&#9;}&#10;&#9;}&#10;}"/>
+                  <text value="import Small_Java.io;&#10;import Small_Java.lang;&#10;&#10;public class_SJ class {&#10;&#9;int_SJ a;&#9;&#10;&#9;int_SJ b;&#10;&#9;int_SJ c;&#10;&#9;main_SJ&#10;&#9;{&#10;&#9;&#9;Out_SJ(&quot;Donner un entier a: &quot;);&#10;&#9;&#9;In_SJ(&quot;%d&quot;,a);&#10;&#9;&#9;Out_SJ(&quot;Donner un entier b: &quot;);&#10;&#9;&#9;In_SJ(&quot;%d&quot;,b);&#10;&#9;&#9;c:=a+b;&#10;&#9;&#9;Out_SJ(&quot;La somme de %d et %d est: %d&quot;,a,b,c);&#10;&#9;}&#10;}"/>
                 </properties>
               </component>
             </children>

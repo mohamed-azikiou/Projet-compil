@@ -268,17 +268,31 @@ public class MainForm {
                             if(TS.get(Quad.Instance.get(i).res).type == TSElement.TYPE.float_SJ) {
                                 ObjectCode.append("CALL READ_FLOAT\n");
                             }
+                            break;
 
-                        case "ECRIRE":
-                            ObjectCode.append("MOV BX, OFFSET " + Quad.Instance.get(i).res + "\n");
-                            if(TS.get(Quad.Instance.get(i).res).type == TSElement.TYPE.string_SJ) {
-                                ObjectCode.append("CALL READ_STR\n");
+                        case "Ecrire":
+                            if(TS.get(Quad.Instance.get(i).res)==null) {
+                                ObjectCode.append("MOV AH, 2\n");
+                                for(int idx = 1; idx<Quad.Instance.get(i).res.length()-1; idx++) {
+                                    if(Quad.Instance.get(i).res.charAt(idx)=='\\'&&Quad.Instance.get(i).res.charAt(idx+1)=='n') {
+                                        ObjectCode.append("MOV DX, 13\nINT 21h\nMOV DX, 10\nINT 21h\n");
+                                        idx++;
+                                    } else {
+                                        ObjectCode.append("MOV DX, '"+Quad.Instance.get(i).res.charAt(idx)+"'\nINT 21h\n");
+                                    }
+                                }
                             }
-                            if(TS.get(Quad.Instance.get(i).res).type == TSElement.TYPE.int_SJ) {
-                                ObjectCode.append("CALL READ_INT\n");
+                            else if(TS.get(Quad.Instance.get(i).res).type == TSElement.TYPE.string_SJ) {
+                                ObjectCode.append("LEA DX, " + Quad.Instance.get(i).res + "\n");
+                                ObjectCode.append("CALL WRITE_STRING\n");
                             }
-                            if(TS.get(Quad.Instance.get(i).res).type == TSElement.TYPE.float_SJ) {
-                                ObjectCode.append("CALL READ_FLOAT\n");
+                            else if(TS.get(Quad.Instance.get(i).res).type == TSElement.TYPE.int_SJ) {
+                                ObjectCode.append("LEA BX, " + Quad.Instance.get(i).res + "\n");
+                                ObjectCode.append("CALL WRITE_INT\n");
+                            }
+                            else if(TS.get(Quad.Instance.get(i).res).type == TSElement.TYPE.float_SJ) {
+                                ObjectCode.append("LEA BX, " + Quad.Instance.get(i).res + "\n");
+                                ObjectCode.append("CALL WRITE_FLOAT\n");
                             }
 
                     }
@@ -290,9 +304,12 @@ public class MainForm {
                 ObjectCode.setText(ObjectCode.getText().replace("PUSH AX\nPOP AX\n",""));
                 ErrorOutput.setText(ErrorOutput.getText()+"Build succeeded\n");
                 ObjectCode.append("\nMOV AX, 4C00h\nINT 21h\n\n");
-                ObjectCode.append("READ_STR:\nMOV AH, 1\nSTART_READ_STR:\nINT 21h\nMOV DS[BX], AL\nINC BX\nCMP AL, 0Dh\nJNE START_READ_STR\nMOV DS[BX-1], '$'\nRET\n\n");
-                ObjectCode.append("READ_INT:\nMOV CH, 0\nMOV SI, 10\nSTART_READ_INT:\nMOV AH, 1\nINT 21h\nCMP AL, 0Dh\nJE END_READ_INT\nMOV CL, AL\nSUB CL, '0'\nMOV AX, DS[BX]\nMUL SI\nADD AX, CX\nMOV DS[BX], AX\nJMP START_READ_INT \nEND_READ_INT:\nRET\n\n");
-                ObjectCode.append("READ_FLOAT:\nXOR CH, CH\nMOV DI, -1\nMOV SI, 10\nSTART_READ_FLOAT:\nMOV AH, 1\nINT 21h\nCMP AL, 0Dh\nJE END_READ_FLOAT\nCMP AL, '.'\nJNE NEX_READ_FLOAT\nMOV DI,0\nJMP START_READ_FLOAT\nNEX_READ_FLOAT:\nCMP DI, 0\nJNGE NEXT_READ_FLOAT\nINC DI\nNEXT_READ_FLOAT:\nMOV CL, AL\nSUB CL, '0'\nMOV AX, DS[BX]\nMUL SI\nADD AX, CX\nMOV DS[BX], AX\nJMP START_READ_FLOAT \nEND_READ_FLOAT:\nMOV CX, DI\nMOV AX, DS[BX]\nCMP CX, 0\nJNG END_END_READ_FLOAT\nLOOP_READ_FLOAT:\nDIV SI\nLOOP LOOP_READ_FLOAT\nMOV DS[BX], AX\nEND_END_READ_FLOAT:\nRET\n\n");
+                ObjectCode.append("READ_STR:\nMOV AH, 1\nSTART_READ_STR:\nINT 21h\nMOV DS[BX], AL\nINC BX\nCMP AL, 0Dh\nJNE START_READ_STR\nMOV DS[BX-1], '$'\nMOV DX, 13\nMOV AH, 2\nINT 21h\nMOV DX, 10\nINT 21h\nRET\n\n");
+                ObjectCode.append("READ_INT:\nMOV CH, 0\nMOV SI, 10\nSTART_READ_INT:\nMOV AH, 1\nINT 21h\nCMP AL, 0Dh\nJE END_READ_INT\nMOV CL, AL\nSUB CL, '0'\nMOV AX, DS[BX]\nMUL SI\nADD AX, CX\nMOV DS[BX], AX\nJMP START_READ_INT \nEND_READ_INT:\n MOV DX, 13\nMOV AH, 2\nINT 21h\nMOV DX, 10\nINT 21h\nRET\n\n");
+                ObjectCode.append("READ_FLOAT:\nXOR CH, CH\nMOV DI, -1\nMOV SI, 10\nSTART_READ_FLOAT:\nMOV AH, 1\nINT 21h\nCMP AL, 0Dh\nJE END_READ_FLOAT\nCMP AL, '.'\nJNE NEX_READ_FLOAT\nMOV DI,0\nJMP START_READ_FLOAT\nNEX_READ_FLOAT:\nCMP DI, 0\nJNGE NEXT_READ_FLOAT\nINC DI\nNEXT_READ_FLOAT:\nMOV CL, AL\nSUB CL, '0'\nMOV AX, DS[BX]\nMUL SI\nADD AX, CX\nMOV DS[BX], AX\nJMP START_READ_FLOAT \nEND_READ_FLOAT:\nMOV CX, DI\nMOV AX, DS[BX]\nCMP CX, 0\nJNG END_END_READ_FLOAT\nLOOP_READ_FLOAT:\nDIV SI\nLOOP LOOP_READ_FLOAT\nMOV DS[BX], AX\nEND_END_READ_FLOAT:\nMOV DX, 13\nMOV AH, 2\nINT 21h\nMOV DX, 10\nINT 21h\nRET\n\n");
+                ObjectCode.append("WRITE_STRING:\nMOV AH,09H \nINT 21H\nRET\n\n");
+                ObjectCode.append("WRITE_INT:\nMOV AX, DS[BX] \nMOV SI, 10\nMOV DX, '$'\nPUSH DX\nLOOP_WRITE_INT:\nXOR DX, DX\nDIV SI\nADD DL, '0'\nPUSH DX\nCMP AX, 0\nJNE LOOP_WRITE_INT\nPOP DX\nMOV AH, 2\nL_LOOP_WRITE_INT:\nINT 21H\nPOP DX\nCMP DX, '$'\nJNE L_LOOP_WRITE_INT\nRET\n\n");
+                ObjectCode.append("WRITE_FLOAT:\nMOV AX, DS[BX] \nMOV SI, 10\nMOV DX, '$'\nPUSH DX\nLOOP_WRITE_FLOAT:\nXOR DX, DX\nDIV SI\nADD DL, '0'\nPUSH DX\nCMP AX, 0\nJNE LOOP_WRITE_FLOAT\nPOP DX\nMOV AH, 2\nL_LOOP_WRITE_FLOAT:\nINT 21H\nPOP DX\nCMP DX, '$'\nJNE L_LOOP_WRITE_FLOAT\nRET\n\n");
                 ObjectCode.append("\nENDS\nEND start\n");
             }
             else {
