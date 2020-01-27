@@ -75,7 +75,7 @@ public class Visitor<Object> extends Small_JavaBaseVisitor<Object> {
                 case "+" : op = "ADD"; break;
                 case "-" : op = "SUB"; break;
                 case "*" : op = "MUL"; break;
-                case "/" : op = "DIV"; break;
+                case "/" : op = "DIV"; try {if(Float.parseFloat(TS.get(ctx.right.getText()).Valeur) == 0) ErrorListener.Errors.add(new ParseCancellationException("line "+ctx.right.getStart().getLine()+": semantic error cannot divide by 0"));} catch (Exception e) {} break;
                 default: op = ctx.op.getText();
             }
             QuadElement quad = new QuadElement(op, left, right,"");
